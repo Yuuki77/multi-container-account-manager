@@ -1,0 +1,23 @@
+{
+  "manifest_version": 2,
+  "name": "Multi-Container Account Manager",
+  "version": "1.0",
+  "description": "Create multiple container tabs from a CSV.",
+  "permissions": [
+    "<all_urls>",
+    "activeTab",
+    "cookies",
+    "contextMenus",
+    "contextualIdentities",
+    "history",
+    "idle",
+    "management",
+    "storage",
+    "tabs",
+    "webRequestBlocking",
+    "webRequest"
+  ],
+  "browser_action": {
+    "default_popup": "popup.html"
+  }
+}
