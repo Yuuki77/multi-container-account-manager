@@ -2,13 +2,30 @@
 <html>
   <head>
     <title>Multi-Container Account Manager</title>
+    <link rel="stylesheet" type="text/css" href="popup.css" />
   </head>
   <body>
     <h1>Multi-Container Account Manager</h1>
-    <button id="delete">Delete Existing Containers</button><br />
-    <button id="extract">Extract Existing Containers</button><br />
-    <textarea id="csvInput" rows="4" cols="50"></textarea><br />
-    <button id="processCSV">Process CSV</button>
+
+    <div class="section">
+      <button id="delete">Delete Existing Containers</button><br />
+      <button id="extract">Extract Existing Containers</button><br />
+    </div>
+
+    <div class="section">
+      <h3>Basic Auth</h3>
+      <label for="username">Username:</label>
+      <input type="text" id="username" /><br />
+      <label for="password">Password:</label>
+      <input type="password" id="password" /><br />
+    </div>
+
+    <div class="section">
+      <h3>CSV Content</h3>
+      <textarea id="csvInput" rows="4" cols="50"></textarea><br />
+      <button id="processCSV">Process CSV</button>
+    </div>
+
     <script src="popup.js"></script>
   </body>
 </html>

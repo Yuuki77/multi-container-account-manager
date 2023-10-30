@@ -7,8 +7,8 @@ document.addEventListener("DOMContentLoaded", function () {
         alert("No containers found.");
         return;
       }
-      identities.forEach((identity) => {
-        browser.contextualIdentities.remove(identity.cookieStoreId);
+      identities.forEach(async (identity) => {
+        await browser.contextualIdentities.remove(identity.cookieStoreId);
       });
       alert("All containers have been deleted.");
     });
@@ -42,6 +42,10 @@ document.addEventListener("DOMContentLoaded", function () {
     .addEventListener("click", async function () {
       const csvContent = document.getElementById("csvInput").value;
       const lines = csvContent.split("\n").slice(1);
+
+      const authUsername = document.getElementById("username").value;
+      const authPassword = document.getElementById("password").value;
+
       for (const line of lines) {
         const [name, url, email, password, color, icon] = line.split(",");
         if (name) {
@@ -59,12 +63,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 cookieStoreId: identity.cookieStoreId,
               });
 
+              if (authUsername && authPassword) {
+                await browser.storage.local.set({
+                  [identity.cookieStoreId]: { authUsername, authPassword },
+                });
+              }
+
               // Inject the content script to fill email and password
               if (email && password) {
                 const code = `
                 const inputs = document.querySelectorAll('input');
                 inputs.forEach((input) => {
-                  if (input.getAttribute('autocomplete') === 'username' || input.id === 'email' || input.name === 'login' || input.id === 'login_field') {
+                  if (input.getAttribute('autocomplete') === 'username' || input.id.includes('email') || input.name === 'login' || input.id === 'login_field') {
                     input.value = "${email}";
                   }
                   if (input.getAttribute('autocomplete') === 'current-password' || input.name === 'pass' || input.name === 'password' || input.id === 'password') {

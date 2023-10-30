@@ -4,6 +4,10 @@
 
 This Firefox extension allows you to manage multiple container tabs. You can delete existing containers, extract container information to a CSV file, and create new containers from a CSV file.
 
+
+## DEMO
+
+
 ## Features
 
 - **Delete Existing Containers**: Remove all existing containers.
