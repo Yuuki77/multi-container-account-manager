@@ -17,13 +17,18 @@
       <label for="username">Username:</label>
       <input type="text" id="username" /><br />
       <label for="password">Password:</label>
-      <input type="password" id="password" /><br />
+      <input type="text" id="password" /><br />
     </div>
 
     <div class="section">
-      <h3>CSV Content</h3>
+      <h3>CSV</h3>
       <textarea id="csvInput" rows="4" cols="50"></textarea><br />
-      <button id="processCSV">Process CSV</button>
+      <button id="processCSV">Generate Containers</button>
+    </div>
+
+    <div class="section">
+      <h3>Containers</h3>
+      <div id="containerList"></div>
     </div>
 
     <script src="popup.js"></script>

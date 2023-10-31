@@ -1,18 +1,57 @@
-document.addEventListener("DOMContentLoaded", function () {
-  // Delete existing containers
-  document.getElementById("delete").addEventListener("click", function () {
-    browser.contextualIdentities.query({}).then((identities) => {
-      if (identities.length === 0) {
-        console.log("No containers found.");
-        alert("No containers found.");
-        return;
-      }
-      identities.forEach(async (identity) => {
-        await browser.contextualIdentities.remove(identity.cookieStoreId);
-      });
-      alert("All containers have been deleted.");
-    });
+function renderAuth() {
+  browser.storage.local.get(["username", "password"]).then((result) => {
+    if (result.username && result.password) {
+      document.getElementById("username").value = result.username;
+      document.getElementById("password").value = result.password;
+    }
   });
+}
+async function removeAllContainers() {
+  browser.contextualIdentities.query({}).then(async (identities) => {
+    if (identities.length === 0) {
+      console.log("No containers found.");
+      alert("No containers found.");
+      return;
+    }
+    identities.forEach(async (identity) => {
+      await browser.contextualIdentities.remove(identity.cookieStoreId);
+    });
+
+    await renderContainers();
+    alert("All containers have been deleted.");
+  });
+}
+
+async function getContainers() {
+  const containers = await browser.contextualIdentities.query({});
+  return containers;
+}
+
+async function renderContainers() {
+  const containers = await getContainers();
+  const containerList = document.getElementById("containerList");
+  containerList.innerHTML = "";
+
+  containers.forEach((container) => {
+    const containerDiv = document.createElement("div");
+    const containerName = document.createTextNode(container.name);
+    containerDiv.appendChild(containerName);
+    containerList.appendChild(containerDiv);
+  });
+}
+
+async function addDeleteHandler() {
+  // Delete existing containers
+  document
+    .getElementById("delete")
+    .addEventListener("click", async function () {
+      await removeAllContainers();
+    });
+}
+document.addEventListener("DOMContentLoaded", async function () {
+  await renderContainers();
+  renderAuth();
+  await addDeleteHandler();
 
   // Extract existing container information
   document.getElementById("extract").addEventListener("click", function () {
@@ -36,6 +75,24 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
+  document
+    .getElementById("username")
+    .addEventListener("input", async function () {
+      const username = document.getElementById("username").value;
+      await browser.storage.local.set({
+        username,
+      });
+    });
+
+  document
+    .getElementById("password")
+    .addEventListener("input", async function () {
+      const password = document.getElementById("password").value;
+      await browser.storage.local.set({
+        password,
+      });
+    });
+
   // Process CSV from textarea
   document
     .getElementById("processCSV")
@@ -58,16 +115,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Open the URL in the newly created container tab
             if (url) {
-              const tab = await browser.tabs.create({
-                url,
-                cookieStoreId: identity.cookieStoreId,
-              });
-
               if (authUsername && authPassword) {
                 await browser.storage.local.set({
                   [identity.cookieStoreId]: { authUsername, authPassword },
                 });
               }
+              const tab = await browser.tabs.create({
+                url,
+                cookieStoreId: identity.cookieStoreId,
+              });
 
               // Inject the content script to fill email and password
               if (email && password) {
@@ -85,6 +141,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 await browser.tabs.executeScript(tab.id, { code });
               }
             }
+            await renderContainers();
           } catch (e) {
             alert(e);
           }
