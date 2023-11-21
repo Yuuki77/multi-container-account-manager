@@ -48,6 +48,25 @@ async function addDeleteHandler() {
       await removeAllContainers();
     });
 }
+
+let currentColorIndex = 0;
+
+function getNextColor() {
+    const colors = ["blue", "green", "yellow", "orange", "red", "pink", "purple"];
+    const color = colors[currentColorIndex];
+    currentColorIndex = (currentColorIndex + 1) % colors.length;
+    return color;
+}
+
+let currentIconIndex = 0;
+
+function getNextIcon() {
+    const icons = ["fingerprint", "briefcase", "dollar", "cart", "vacation", "gift", "food", "fruit", "pet", "tree", "chill", "circle", "fence"];
+    const icon = icons[currentIconIndex];
+    currentIconIndex = (currentIconIndex + 1) % icons.length;
+    return icon;
+}
+
 document.addEventListener("DOMContentLoaded", async function () {
   await renderContainers();
   renderAuth();
@@ -109,8 +128,8 @@ document.addEventListener("DOMContentLoaded", async function () {
           try {
             const identity = await browser.contextualIdentities.create({
               name,
-              color: color || "blue",
-              icon: icon || "fingerprint",
+              color: color || getNextColor(),
+              icon: icon || getNextIcon()
             });
 
             // Open the URL in the newly created container tab

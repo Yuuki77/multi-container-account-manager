@@ -1,7 +1,7 @@
 name,url,email,password,color,icon
-GithubA,https://github.com/login,email@example.com,password123,red,fingerprint
-GithubB,https://github.com/login,email2@example.com,password123,blue,fingerprint
-FacebookA,https://www.facebook.com/?locale=ja_JP,email2@example.com,password123,blue,fingerprint
-FacebookB,https://www.facebook.com/?locale=ja_JP,email2@example.com,password123,blue,fingerprint
-linkedinA,https://jp.linkedin.com/,email2@example.com,password123,blue,fingerprint
-linkedinB,https://jp.linkedin.com,email2@example.com,password123,blue,fingerprint
+Gitlab,https://gitlab.com/login,email@example.com,password123
+GithubB,https://github.com/login,email2@example.com,password123
+FacebookA,https://www.facebook.com/?locale=ja_JP,email2@example.com,password123
+FacebookB,https://www.facebook.com/?locale=ja_JP,email2@example.com,password123
+linkedinA,https://jp.linkedin.com/,email2@example.com,password123
+linkedinB,https://jp.linkedin.com,email2@example.com,password123

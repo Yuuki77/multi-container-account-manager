@@ -57,9 +57,9 @@ The CSV should have the following columns:
 
 Example:
 ```
-name,url,email,password,color,icon
-GithubA,https://github.com/login,email@gmail.com,password123,red,fingerprint
-GithubB,https://github.com/login,email2@gmail.com,password123,blue,fingerprint
+name,url,email,password
+GithubA,https://github.com/login,email@gmail.com,password123
+GithubB,https://github.com/login,email2@gmail.com,password123
 ```
 
 ## Troubleshooting
