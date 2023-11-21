@@ -1,3 +1,49 @@
+
+function displayCSVAsTable(csvString) {
+  const lines = csvString.split("\n");
+  const header = lines[0].split(",");
+  const body = lines.slice(1);
+
+  // Get references to the header and body of the table
+  const headerRow = document.getElementById("csvHeaderRow");
+  const tbody = document.getElementById("csvBody");
+
+  // Clear existing content in the table header and body
+  headerRow.innerHTML = '';
+  tbody.innerHTML = '';
+
+  // Populate the header row
+  header.forEach(header => {
+    const th = document.createElement("th");
+    th.textContent = header;
+    headerRow.appendChild(th);
+  });
+
+  // Populate the table body
+  body.forEach((line, rowIndex) => {
+    const tr = document.createElement("tr");
+    line.split(",").forEach((cell, cellIndex) => {
+      const td = document.createElement("td");
+      const input = document.createElement("input");
+      input.value = cell;
+      input.type = "text";
+
+      // Add an event listener if this cell is a 'name' cell
+      if (header[cellIndex] === "name") {
+        input.addEventListener("change", (event) => {
+          updateContainerName(rowIndex, event.target.value);
+          renderContainers()
+        });
+      }
+
+      td.appendChild(input);
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);  // Append the row to the tbody element
+  });
+
+}
+
 function renderAuth() {
   browser.storage.local.get(["username", "password"]).then((result) => {
     if (result.username && result.password) {
@@ -7,6 +53,9 @@ function renderAuth() {
   });
 }
 async function removeAllContainers() {
+  displayCSVAsTable("");
+  document.getElementById("csvInput").value = ""; // P
+
   browser.contextualIdentities.query({}).then(async (identities) => {
     if (identities.length === 0) {
       console.log("No containers found.");
@@ -24,7 +73,35 @@ async function removeAllContainers() {
 
 async function getContainers() {
   const containers = await browser.contextualIdentities.query({});
+  updateRowIndexToContainerIdMap(containers);
   return containers;
+}
+
+let rowIndexToContainerIdMap = {};
+
+function updateRowIndexToContainerIdMap(containers) {
+  rowIndexToContainerIdMap = {}; // Reset the map
+  containers.forEach((container, index) => {
+    rowIndexToContainerIdMap[index] = container.cookieStoreId;
+  });
+}
+function getContainerIdFromRowIndex(rowIndex) {
+  return rowIndexToContainerIdMap[rowIndex];
+}
+
+async function updateContainerName(rowIndex, newName) {
+  const containerId = getContainerIdFromRowIndex(rowIndex);
+  if (!containerId) {
+    console.error('No container found for row index:', rowIndex);
+    return;
+  }
+
+  try {
+    const updatedContainer = await browser.contextualIdentities.update(containerId, { name: newName });
+    console.log('Container updated:', updatedContainer);
+  } catch (error) {
+    console.error('Error updating container:', error);
+  }
 }
 
 async function renderContainers() {
@@ -39,6 +116,8 @@ async function renderContainers() {
     containerList.appendChild(containerDiv);
   });
 }
+
+
 
 async function addDeleteHandler() {
   // Delete existing containers
@@ -68,6 +147,12 @@ function getNextIcon() {
 }
 
 document.addEventListener("DOMContentLoaded", async function () {
+  const storedCsv = localStorage.getItem("csvData");
+  if (storedCsv) {
+    displayCSVAsTable(storedCsv);
+    document.getElementById("csvInput").value = storedCsv; // Populate the textarea as well
+  }
+
   await renderContainers();
   renderAuth();
   await addDeleteHandler();
@@ -112,11 +197,37 @@ document.addEventListener("DOMContentLoaded", async function () {
       });
     });
 
+function getCsvFromTable() {
+  const headerRow = document.getElementById("csvHeaderRow");
+  const tbody = document.getElementById("csvBody");
+  let csvContent = [Array.from(headerRow.children).map(th => th.textContent).join(",")];
+
+  Array.from(tbody.children).forEach(tr => {
+    const rowData = Array.from(tr.children).map(td => td.firstChild.value);
+    csvContent.push(rowData.join(","));
+  });
+
+  return csvContent.join("\n");
+}
+
+function saveCSVToLocalStorage(csvString) {
+  localStorage.setItem("csvData", csvString);
+}
+
+window.addEventListener("beforeunload", function () {
+  const csvString = getCsvFromTable();
+  saveCSVToLocalStorage(csvString);
+});
+
   // Process CSV from textarea
   document
     .getElementById("processCSV")
     .addEventListener("click", async function () {
       const csvContent = document.getElementById("csvInput").value;
+
+      displayCSVAsTable(csvContent);
+      saveCSVToLocalStorage(csvContent); // Save initial CSV to local storage
+
       const lines = csvContent.split("\n").slice(1);
 
       const authUsername = document.getElementById("username").value;
